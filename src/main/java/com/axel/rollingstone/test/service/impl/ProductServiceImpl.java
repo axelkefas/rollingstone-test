@@ -64,6 +64,8 @@ public class ProductServiceImpl implements ProductService {
             throw new GlobalException(StatusCode.NOT_FOUND,product.getName()+" not found");
         }
         existingProduct.setName(product.getName());
+        existingProduct.setLabel(product.getLabel());
+        existingProduct.setDetail(product.getDetail());
         existingProduct.setQuantity(product.getQuantity());
         existingProduct.setPrice(product.getPrice());
         return repository.save(existingProduct);
@@ -120,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
             throw new GlobalException(StatusCode.NOT_FOUND, "User Not Found");
         }
         Optional<RedeemProduct> redeemProductOptional = redeemProductRepository.findRedeemProductByUserAndProduct(userOptional.get(),productOptional.get());
-        if(redeemProductOptional.isPresent())
+        if(redeemProductOptional.get().getRating()!=0)
         {
             throw new GlobalException(StatusCode.INTERNAL_ERROR, "Product have been rating");
         }

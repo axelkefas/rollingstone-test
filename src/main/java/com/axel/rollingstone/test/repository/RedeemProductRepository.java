@@ -15,6 +15,6 @@ public interface RedeemProductRepository extends JpaRepository<RedeemProduct, In
 
     Integer countRedeemProductByProduct(Product product);
 
-    @Query(value = "SELECT SUM(rating) FROM tbl_redeem_product WHERE product = ?1", nativeQuery = true)
+    @Query(value = "SELECT SUM(rating) FROM tbl_redeem_product WHERE product_id = ?1", nativeQuery = true)
     Integer getRatingTotal(int id);
 }

@@ -1,5 +1,7 @@
 package com.axel.rollingstone.test.controller;
 
+import com.axel.rollingstone.test.config.GlobalException;
+import com.axel.rollingstone.test.config.StatusCode;
 import com.axel.rollingstone.test.entity.Product;
 import com.axel.rollingstone.test.entity.User;
 import com.axel.rollingstone.test.service.ProductService;
@@ -27,13 +29,22 @@ public class ProductController {
 
     @PostMapping("/gifts/{id}/redeem")
     public void redeemProduct(@RequestHeader("Authorization") String authorization, @PathVariable int id, @RequestBody Product product){
-        StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
-        textEncryptor.setPassword("123");
-        String decryptId = textEncryptor.decrypt(authorization);
 
-        User user = userService.findUserById(Integer.getInteger(decryptId));
+            String decryptId = decrypt(authorization);
+            User user = userService.findUserById(Integer.parseInt(decryptId));
 
-        service.redeemProduct(user.getId(),id, product.getQuantity());
+            service.redeemProduct(user.getId(),id, product.getQuantity());
+
+    }
+
+    @PostMapping("/gifts/{id}/rating")
+    public void ratingProduct(@RequestHeader("Authorization") String authorization, @PathVariable int id, @RequestBody Product product){
+
+        String decryptId = decrypt(authorization);
+        User user = userService.findUserById(Integer.parseInt(decryptId));
+
+        service.ratingProduct(user.getId(),id, (int)product.getRating());
+
     }
 
     @GetMapping("/gifts")
@@ -54,5 +65,18 @@ public class ProductController {
     @DeleteMapping("/gifts/{id}")
     public void deleteProduct(@PathVariable int id){
         service.deleteProduct(id);
+    }
+
+    private String decrypt(String token){
+        try {
+            StrongTextEncryptor textEncryptor = new StrongTextEncryptor();
+            textEncryptor.setPassword("123");
+
+            return textEncryptor.decrypt(token);
+        }
+        catch (Exception e)
+        {
+            throw new GlobalException(StatusCode.UNAUTHORIZED,"Unauthorized");
+        }
     }
 }
